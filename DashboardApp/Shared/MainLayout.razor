@@ -1,0 +1,100 @@
+﻿@using SoapServices.Services
+@using SoapServices.Models
+@using FTPServices.Services
+@using DashboardApp.Services
+@using System.Dynamic
+@inherits LayoutComponentBase
+@inject IWeatherForcastService weatherForcastService
+@inject IFtpServices ftpServices
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Diagnostics
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+<div class="page">
+    <div>
+        <div class="container">
+            <h1 class="title-box">
+                Dashboard
+            </h1>
+            @Body
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="dashboard-box">
+                        <h2>SOAP</h2>
+                        <ul>
+                            <li>
+                                Solopgang:
+                                <p>@weatherForcastDto.Sunrise</p>
+                            </li>
+                            <li>
+                                Solnedgang:
+                                <p>@weatherForcastDto.Sunset</p>
+                            </li>
+                            <li>
+                                Temperatur: <p>@weatherForcastDto.Temp</p>
+                            </li>
+                            <li>
+                                Vind temperatur:<p>@weatherForcastDto.Windchill</p>
+                            </li>
+                            <li> Dato:<p>@weatherForcastDto.datetime</p> </li>
+                        </ul>
+
+                        JSON Format: @weatherForcastJson
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="dashboard-box">
+                        <h2>FTP Solpanel</h2>
+                        <div>
+                            KWH:
+                            <p> @power </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private HubConnection? hubConnection;
+    private string weatherForcastJson = "";
+    private WeatherForcastDto weatherForcastDto = new WeatherForcastDto();
+    public int power = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        weatherForcastDto = await weatherForcastService.GetWeatherForcastAsync("kolding");
+
+        weatherForcastJson = weatherForcastDto.ConvertToJSON();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/notifyhub"))
+            .Build();
+
+        hubConnection.On("ReceiveNotification", () =>
+        {
+            power = ftpServices.GetCalculatePower();
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+
+        power = ftpServices.GetCalculatePower();
+
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+}
