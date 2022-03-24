@@ -5,7 +5,7 @@ namespace DashboardApp.Services
 {
     public interface IDataService
     {
-        Task NofifyDashBoardDataHasChanged();
+        Task NotifyDashBoardDataHasChanged();
     }
     public class DataService : IDataService
     {
@@ -16,7 +16,7 @@ namespace DashboardApp.Services
             _context = context;
         }
 
-        public async Task NofifyDashBoardDataHasChanged()
+        public async Task NotifyDashBoardDataHasChanged()
         {
            await _context.Clients.All.ReceiveNotification();
         }

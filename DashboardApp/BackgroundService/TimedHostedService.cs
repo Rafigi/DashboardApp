@@ -33,7 +33,7 @@ namespace DashboardApp.BackgroundService
                     scope.ServiceProvider
                         .GetRequiredService<IDataService>();
 
-                await dataService.NofifyDashBoardDataHasChanged();
+                await dataService.NotifyDashBoardDataHasChanged();
             }
         }
 

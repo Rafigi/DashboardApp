@@ -1,11 +1,13 @@
 using DashboardApp.BackgroundService;
 using DashboardApp.Services;
+using FTPServices.Models;
 using FTPServices.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SoapServices.Models;
 using SoapServices.Services;
 
 namespace DashboardApp
@@ -29,6 +31,10 @@ namespace DashboardApp
             services.AddScoped<IWeatherForcastService, WeatherForcastService>();
             services.AddScoped<IFtpServices, FtpServices>();
             services.AddScoped<IDataService, DataService>();
+
+            services.Configure<FtpSettings>(Configuration.GetSection("FtpSettings"));
+            services.Configure<SoapSettings>(Configuration.GetSection("SoapSettings"));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

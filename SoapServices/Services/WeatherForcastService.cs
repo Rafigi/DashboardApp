@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using ServiceReference1;
 using SoapServices.Models;
 
@@ -14,14 +15,18 @@ namespace SoapServices.Services
 
     public class WeatherForcastService : IWeatherForcastService
     {
+        private readonly IOptions<SoapSettings> _soapSettings;
 
-
+        public WeatherForcastService(IOptions<SoapSettings> soapSettings )
+        {
+            _soapSettings = soapSettings;
+        }
 
 
         public async Task<WeatherForcastDto> GetWeatherForcastAsync(string location)
         {
             var client = new ForecastServiceClient();
-            var result = await client.GetForecastAsync(location, _key);
+            var result = await client.GetForecastAsync(location, _soapSettings.Value.Password);
 
             var selectedResult = result.Body.GetForecastResult.location.currentConditions;
 

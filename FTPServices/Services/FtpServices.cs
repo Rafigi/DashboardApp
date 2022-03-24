@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using FTPServices.Models;
+using Microsoft.Extensions.Options;
 
 namespace FTPServices.Services
 {
@@ -13,6 +15,12 @@ namespace FTPServices.Services
     }
     public class FtpServices : IFtpServices
     {
+        private readonly IOptions<FtpSettings> _ftpOptions;
+
+        public FtpServices(IOptions<FtpSettings> ftpOptions)
+        {
+            _ftpOptions = ftpOptions;
+        }
         public int GetCalculatePower()
         {
 
@@ -100,7 +108,15 @@ namespace FTPServices.Services
 
         private FtpWebRequest CreateFtpWebRequest(string requestMethod, string filename = null)
         {
-            string ftpServerUri;
+            string ftpServerUri = _ftpOptions.Value.FtpServerUri;
+
+            if (filename != null)
+            {
+                ftpServerUri = $"{ftpServerUri}/{filename}";
+            }
+
+            string userName = _ftpOptions.Value.Username;
+            string password = _ftpOptions.Value.Password;
 
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpServerUri); ;
             request.Method = requestMethod;
