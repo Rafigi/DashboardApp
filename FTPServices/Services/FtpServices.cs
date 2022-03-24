@@ -101,18 +101,7 @@ namespace FTPServices.Services
         private FtpWebRequest CreateFtpWebRequest(string requestMethod, string filename = null)
         {
             string ftpServerUri;
-            if (filename != null)
-            {
-                ftpServerUri = $"ftp://inverter.westeurope.cloudapp.azure.com/{filename}";
-            }
-            else
-            {
 
-                ftpServerUri = "ftp://inverter.westeurope.cloudapp.azure.com";
-            }
-
-            string userName = "studerende";
-            string password = "kmdp4gslmg46jhs";
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpServerUri); ;
             request.Method = requestMethod;
 

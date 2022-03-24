@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using DashboardApp.Services;
-using FTPServices.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -22,7 +20,6 @@ namespace DashboardApp.BackgroundService
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-
             int waitingMinutes = 60 - DateTime.Now.Minute;
             _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(waitingMinutes), TimeSpan.FromHours(1));
             return Task.CompletedTask;

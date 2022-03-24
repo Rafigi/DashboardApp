@@ -15,7 +15,7 @@ namespace SoapServices.Services
     public class WeatherForcastService : IWeatherForcastService
     {
 
-        private readonly string _key = "Jeger1studerende";
+
 
 
         public async Task<WeatherForcastDto> GetWeatherForcastAsync(string location)
