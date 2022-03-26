@@ -1,15 +1,12 @@
-﻿@using SoapServices.Services
-@using SoapServices.Models
-@using FTPServices.Services
-@using DashboardApp.Services
-@using System.Dynamic
+﻿@using FTPServices.Services
 @inherits LayoutComponentBase
-@inject IWeatherForcastService weatherForcastService
 @inject IFtpServices ftpServices
 @using Microsoft.AspNetCore.SignalR.Client
-@using System.Diagnostics
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
+@inject IDataService dataService
+@using DashboardApp.Models
+@using DashboardApp.Services
 
 <div class="page">
     <div>
@@ -24,25 +21,28 @@
                 <div class="col">
                     <div class="dashboard-box">
                         <h2>SOAP</h2>
-                        <ul>
-                            <li>
-                                Solopgang:
-                                <p>@weatherForcastDto.Sunrise</p>
-                            </li>
-                            <li>
-                                Solnedgang:
-                                <p>@weatherForcastDto.Sunset</p>
-                            </li>
-                            <li>
-                                Temperatur: <p>@weatherForcastDto.Temp</p>
-                            </li>
-                            <li>
-                                Vind temperatur:<p>@weatherForcastDto.Windchill</p>
-                            </li>
-                            <li> Dato:<p>@weatherForcastDto.datetime</p> </li>
-                        </ul>
+                        <p>Solopgang: @Sunrise </p>
+                        <p>Solnedgang: @sunset </p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Dato</th>
+                                    <th scope="col">Temperatur</th>
+                                    <th scope="col">Skydækket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var weatherForcastDto in weatherForcastDtos)
+                                {
+                                    <tr>
+                                        <td>@weatherForcastDto.Datetime </td>
+                                        <td>@weatherForcastDto.Temp C </td>
+                                        <td>@weatherForcastDto.CloudCover %</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
 
-                        JSON Format: @weatherForcastJson
                     </div>
                 </div>
                 <div class="col">
@@ -62,16 +62,18 @@
 
 @code {
     private HubConnection? hubConnection;
-    private string weatherForcastJson = "";
-    private WeatherForcastDto weatherForcastDto = new WeatherForcastDto();
+    private List<WeatherForcastDto> weatherForcastDtos = new List<WeatherForcastDto>();
     public int power = 0;
+    DateTime Sunrise = new DateTime();
+    DateTime sunset = new DateTime();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        weatherForcastDto = await weatherForcastService.GetWeatherForcastAsync("kolding");
+        weatherForcastDtos = await dataService.GetWeatherForcast("kolding");
 
-        weatherForcastJson = weatherForcastDto.ConvertToJSON();
+        sunset = weatherForcastDtos.First().Sunset;
+        Sunrise = weatherForcastDtos.First().Sunrise;
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/notifyhub"))
@@ -88,7 +90,7 @@
         power = ftpServices.GetCalculatePower();
 
     }
-
+    
     public async ValueTask DisposeAsync()
     {
         if (hubConnection is not null)

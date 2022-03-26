@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ServiceReference1;
@@ -9,7 +12,7 @@ namespace SoapServices.Services
 
     public interface IWeatherForcastService
     {
-        Task<WeatherForcastDto> GetWeatherForcastAsync(string location);
+        Task<List<WeatherForcastDto>> GetWeatherForcastAsync(string location);
     }
 
 
@@ -17,18 +20,18 @@ namespace SoapServices.Services
     {
         private readonly IOptions<SoapSettings> _soapSettings;
 
-        public WeatherForcastService(IOptions<SoapSettings> soapSettings )
+        public WeatherForcastService(IOptions<SoapSettings> soapSettings)
         {
             _soapSettings = soapSettings;
         }
 
 
-        public async Task<WeatherForcastDto> GetWeatherForcastAsync(string location)
+        public async Task<List<WeatherForcastDto>> GetWeatherForcastAsync(string location)
         {
             var client = new ForecastServiceClient();
             var result = await client.GetForecastAsync(location, _soapSettings.Value.Password);
 
-            var selectedResult = result.Body.GetForecastResult.location.currentConditions;
+            var selectedResult = result.Body.GetForecastResult.location;
 
             return selectedResult
                 .MapToWeatherForcastDto();
@@ -38,15 +41,17 @@ namespace SoapServices.Services
 
     public static class ServiceHelper
     {
-        public static WeatherForcastDto MapToWeatherForcastDto(this Currentconditions currentConditions)
+        public static List<WeatherForcastDto> MapToWeatherForcastDto(this Location currentLocation)
         {
-            return new WeatherForcastDto()
+            return currentLocation.values.Where(p => p.datetimeStr.Date == DateTime.Now.Date).Select(weather => new WeatherForcastDto()
             {
-                Sunrise = currentConditions.sunrise,
-                Sunset = currentConditions.sunset,
-                Temp = currentConditions.temp ?? 0,
-                Windchill = currentConditions.windchill ?? 0
-            };
+                CloudCover = weather.cloudcover ?? 0,
+                Sunrise = currentLocation.currentConditions.sunrise,
+                Sunset = currentLocation.currentConditions.sunset,
+                Temp = weather.temp ?? 0,
+                Datetime = weather.datetimeStr
+            })
+                .ToList();
         }
 
         public static string ConvertToJSON(this WeatherForcastDto weatherForcastDto)

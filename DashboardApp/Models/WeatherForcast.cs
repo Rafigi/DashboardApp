@@ -1,5 +1,6 @@
 ﻿using System;
-namespace SoapServices.Models
+
+namespace DashboardApp.Models
 {
     public class WeatherForcastDto
     {

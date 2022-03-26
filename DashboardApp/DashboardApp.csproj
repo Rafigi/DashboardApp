@@ -6,11 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.15" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FTPServices\FTPServices.csproj" />
-    <ProjectReference Include="..\SoapServices\SoapServices.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,6 +20,8 @@
     border-width: 2px;
     padding: 50px;
     font-weight: bold;
+    overflow: scroll;
+    height: 600px;
 }
 
 .dashboard-box li {

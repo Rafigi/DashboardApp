@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using FTPServices.Models;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,6 @@ namespace FTPServices.Services
         }
         public int GetCalculatePower()
         {
-
             string fileName = GetFileName();
 
             FtpWebRequest ftpWebRequest = CreateFtpWebRequest(WebRequestMethods.Ftp.DownloadFile, fileName);
@@ -35,7 +35,7 @@ namespace FTPServices.Services
 
 
             int columnIndex = -1;
-            var value = new List<string>();
+            var value = new List<int>();
             foreach (string rows in reader.ReadToEnd().Split('\n').Skip(5))
             {
                 if (!string.IsNullOrEmpty(rows))
@@ -47,8 +47,12 @@ namespace FTPServices.Services
                     else
                     {
                         var row = rows.Split(';');
-                        if (row.Length > 10)
-                            value.Add(row[columnIndex]);
+
+                        if (row.Length >= columnIndex + 1)
+                        {
+                            if (int.TryParse(row[columnIndex], out int result))
+                                value.Add(result);
+                        }
                     }
 
                 }
@@ -56,7 +60,6 @@ namespace FTPServices.Services
 
             reader.Dispose();
             reader.Close();
-
 
             return calculateGeneratePower(value);
         }
@@ -67,43 +70,60 @@ namespace FTPServices.Services
             FtpWebResponse response = (FtpWebResponse)ftpWebRequest.GetResponse();
 
             Stream responseStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(responseStream);
+            MemoryStream destination = new MemoryStream();
+            responseStream.CopyTo(destination);
 
-            DateTime todayDateTime = DateTime.Now;
+
+            string filename = TryLookUpFileName(destination, DateTime.Now);
+
+            destination.Dispose();
+            response.Close();
+            return filename;
+        }
+
+        private string TryLookUpFileName(Stream stream, DateTime date)
+        {
+            string searchDate = DateBuilder(date);
+            string filename = null;
+
+
+            string line = string.Empty;
+            StreamReader sr = new StreamReader(stream);
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (line.Contains(searchDate))
+                    filename = line;
+
+            }
+
+            stream.Position = 0;
+
+            if (filename == null)
+                return TryLookUpFileName(stream, date.AddHours(-1));
+
+            return filename;
+        }
+
+        private string DateBuilder(DateTime dateTime)
+        {
+            DateTime todayDateTime = dateTime;
             // We need to minus with 1, because we don't have files created in 2022
             string year = (todayDateTime.Year - 1).ToString().Substring(2, 2);
             string month = todayDateTime.Month.ToString().PadLeft(2, '0');
             string day = todayDateTime.Day.ToString().PadLeft(2, '0');
             string hour = todayDateTime.Hour.ToString().PadLeft(2, '0');
 
-            if (Convert.ToInt32(hour) < 6)
-                hour = "06";
-
-            if (Convert.ToInt32(hour) > 19)
-                hour = "19";
-
-            string date = new StringBuilder()
+            return new StringBuilder()
                 .Append(year)
                 .Append(month)
                 .Append(day)
                 .Append(hour)
                 .ToString();
-
-            string line = string.Empty;
-            string filename = string.Empty;
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (line.Contains(date))
-                    filename = line;
-            }
-            reader.Close();
-            response.Close();
-            return filename;
         }
 
-        private int calculateGeneratePower(List<string> powers)
+        private int calculateGeneratePower(List<int> powers)
         {
-            return Convert.ToInt32(powers.Last()) - Convert.ToInt32(powers.First());
+            return powers.Last() - powers.First();
         }
 
         private FtpWebRequest CreateFtpWebRequest(string requestMethod, string filename = null)
