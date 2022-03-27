@@ -9,6 +9,7 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
     "Password": "",
     "FtpServerUri": ""
   }
+  n/
   
   I WeatherServiceAPI skal der tilføjes et password i  Settings for a kommunikere med SoapServicen.
    "SOAPSettings": {
