@@ -18,5 +18,6 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
     "Password": ""
   }
   
-  
+  ![image](https://user-images.githubusercontent.com/36636158/160300070-dc48afea-0933-418f-84d7-4c9d2834f2cc.png)
+
   
