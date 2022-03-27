@@ -22,12 +22,15 @@
                 <div class="col">
                     <div class="dashboard-box">
                         <h2>SOAP</h2>
-                        <p>Solopgang: @Sunrise </p>
-                        <p>Solnedgang: @sunset </p>
+                        <div class="sunbox">
+                            <p>Solopgang: @Sunrise.ToShortTimeString() </p>
+                            <p>Solnedgang: @sunset.ToShortTimeString() </p>
+                        </div>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">Dato</th>
+                                    <th scope="col">Tidspunkt</th>
                                     <th scope="col">Temperatur</th>
                                     <th scope="col">Skydækket</th>
                                 </tr>
@@ -36,7 +39,8 @@
                                 @foreach (var weatherForcastDto in weatherForcastDtos)
                                 {
                                     <tr>
-                                        <td>@weatherForcastDto.Datetime </td>
+                                        <td>@weatherForcastDto.Datetime.ToShortDateString() </td>
+                                        <td>@weatherForcastDto.Datetime.ToLongTimeString() </td>
                                         <td>@weatherForcastDto.Temp C </td>
                                         <td>@weatherForcastDto.CloudCover %</td>
                                     </tr>

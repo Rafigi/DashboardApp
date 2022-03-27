@@ -20,8 +20,15 @@
     border-width: 2px;
     padding: 50px;
     font-weight: bold;
-    overflow: scroll;
+    overflow-y: scroll;
     height: 600px;
+}
+
+.dashboard-box .sunbox {
+    border-style: outset;
+    width: max-content;
+    padding: 5px 25px;
+    float: right;
 }
 
 .dashboard-box li {
