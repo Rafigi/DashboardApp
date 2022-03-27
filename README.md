@@ -18,6 +18,9 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
     "Password": ""
   }
   
+  
+  Hvis API ikke virker, tjek om porten i launchsettings i Dashboard projektet til 44320.
+  
   ![image](https://user-images.githubusercontent.com/36636158/160300070-dc48afea-0933-418f-84d7-4c9d2834f2cc.png)
 
   
