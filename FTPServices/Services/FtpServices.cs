@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using FTPServices.Models;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +12,7 @@ namespace FTPServices.Services
 {
     public interface IFtpServices
     {
-        int GetCalculatePower();
+        Task<SolarPanel> GetCalculateSolarPower();
     }
     public class FtpServices : IFtpServices
     {
@@ -22,17 +22,17 @@ namespace FTPServices.Services
         {
             _ftpOptions = ftpOptions;
         }
-        public int GetCalculatePower()
+
+        public async Task<SolarPanel> GetCalculateSolarPower()
         {
             string fileName = GetFileName();
 
             FtpWebRequest ftpWebRequest = CreateFtpWebRequest(WebRequestMethods.Ftp.DownloadFile, fileName);
-            FtpWebResponse response = (FtpWebResponse)ftpWebRequest.GetResponse();
+            FtpWebResponse response = (FtpWebResponse)(await ftpWebRequest.GetResponseAsync());
 
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
             string line = string.Empty;
-
 
             int columnIndex = -1;
             var value = new List<int>();
@@ -54,14 +54,17 @@ namespace FTPServices.Services
                                 value.Add(result);
                         }
                     }
-
                 }
             }
 
             reader.Dispose();
             reader.Close();
 
-            return calculateGeneratePower(value);
+            return new SolarPanel()
+            {
+                Energy = calculateGeneratePower(value),
+                Date = DateTime.Now
+            };
         }
 
         private string GetFileName()
@@ -129,21 +132,29 @@ namespace FTPServices.Services
         private FtpWebRequest CreateFtpWebRequest(string requestMethod, string filename = null)
         {
             string ftpServerUri = _ftpOptions.Value.FtpServerUri;
-
-            if (filename != null)
+            try
             {
-                ftpServerUri = $"{ftpServerUri}/{filename}";
+                if (filename != null)
+                {
+                    ftpServerUri = $"{ftpServerUri}/{filename}";
+                }
+
+                string userName = _ftpOptions.Value.Username;
+                string password = _ftpOptions.Value.Password;
+
+                var request = WebRequest.Create(ftpServerUri); ;
+                request.Method = requestMethod;
+
+                request.Credentials = new NetworkCredential(userName, password);
+
+                return (FtpWebRequest)request;
+
             }
+            catch (Exception ex)
+            {
 
-            string userName = _ftpOptions.Value.Username;
-            string password = _ftpOptions.Value.Password;
-
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpServerUri); ;
-            request.Method = requestMethod;
-
-            request.Credentials = new NetworkCredential(userName, password);
-
-            return request;
+                throw new Exception(ex.Message);
+            }
 
         }
     }

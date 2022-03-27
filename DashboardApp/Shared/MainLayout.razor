@@ -7,6 +7,7 @@
 @inject IDataService dataService
 @using DashboardApp.Models
 @using DashboardApp.Services
+@using FTPServices.Models
 
 <div class="page">
     <div>
@@ -49,8 +50,11 @@
                     <div class="dashboard-box">
                         <h2>FTP Solpanel</h2>
                         <div>
-                            KWH:
-                            <p> @power </p>
+                            <p>@solarPanel.Date</p>
+
+                            Nuværende genereret strøm:
+                            <p> @solarPanel.Energy KWH</p>
+
                         </div>
                     </div>
                 </div>
@@ -63,7 +67,7 @@
 @code {
     private HubConnection? hubConnection;
     private List<WeatherForcastDto> weatherForcastDtos = new List<WeatherForcastDto>();
-    public int power = 0;
+    public SolarPanel solarPanel = new SolarPanel();
     DateTime Sunrise = new DateTime();
     DateTime sunset = new DateTime();
 
@@ -79,18 +83,18 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/notifyhub"))
             .Build();
 
-        hubConnection.On("ReceiveNotification", () =>
+        hubConnection.On("ReceiveNotification", async () =>
         {
-            power = ftpServices.GetCalculatePower();
+            solarPanel = await ftpServices.GetCalculateSolarPower();
             StateHasChanged();
         });
 
         await hubConnection.StartAsync();
 
-        power = ftpServices.GetCalculatePower();
+        solarPanel = await ftpServices.GetCalculateSolarPower();
 
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         if (hubConnection is not null)
