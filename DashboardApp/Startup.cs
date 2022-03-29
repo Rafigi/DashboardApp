@@ -2,10 +2,14 @@ using System;
 using System.Net.Http;
 using DashboardApp.BackgroundService;
 using DashboardApp.Services;
+using DatabaseService.Context;
+using DatabaseService.Repository;
+using DatabaseService.Services;
 using FTPServices.Models;
 using FTPServices.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +34,13 @@ namespace DashboardApp
             services.AddHostedService<TimedHostedService>();
             services.AddScoped<IFtpServices, FtpServices>();
             services.AddScoped<IDataService, DataService>();
+            services.AddScoped<IDatabaseServices, DatabaseServices>();
+            services.AddScoped<ITemperaturRepository, TemperaturRepository>();
+
+            services.AddDbContext<IndeklimaContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             services.Configure<FtpSettings>(Configuration.GetSection("FtpSettings"));
             services.AddScoped<HttpClient>(s =>

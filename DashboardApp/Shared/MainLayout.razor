@@ -1,13 +1,13 @@
-﻿@using FTPServices.Services
-@inherits LayoutComponentBase
-@inject IFtpServices ftpServices
+﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
-@implements IAsyncDisposable
 @inject IDataService dataService
+@implements IAsyncDisposable
 @using DashboardApp.Models
 @using DashboardApp.Services
+@using DatabaseService.Dtos
 @using FTPServices.Models
+
 
 <div class="page">
     <div>
@@ -26,28 +26,29 @@
                             <p>Solopgang: @Sunrise.ToShortTimeString() </p>
                             <p>Solnedgang: @sunset.ToShortTimeString() </p>
                         </div>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Dato</th>
-                                    <th scope="col">Tidspunkt</th>
-                                    <th scope="col">Temperatur</th>
-                                    <th scope="col">Skydækket</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var weatherForcastDto in weatherForcastDtos)
-                                {
+                        <div class="table-box">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>@weatherForcastDto.Datetime.ToShortDateString() </td>
-                                        <td>@weatherForcastDto.Datetime.ToLongTimeString() </td>
-                                        <td>@weatherForcastDto.Temp C </td>
-                                        <td>@weatherForcastDto.CloudCover %</td>
+                                        <th scope="col">Dato</th>
+                                        <th scope="col">Tidspunkt</th>
+                                        <th scope="col">Temperatur</th>
+                                        <th scope="col">Skydækket</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-
+                                </thead>
+                                <tbody>
+                                    @foreach (var weatherForcastDto in weatherForcastDtos)
+                                    {
+                                        <tr>
+                                            <td>@weatherForcastDto.Datetime.ToShortDateString() </td>
+                                            <td>@weatherForcastDto.Datetime.ToLongTimeString() </td>
+                                            <td>@weatherForcastDto.Temp &#8451 </td>
+                                            <td>@weatherForcastDto.CloudCover %</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div class="col">
@@ -62,6 +63,34 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col">
+                    <div class="dashboard-box">
+                        <h2>Database: Temparetur indenfor</h2>
+                        <div class="table-box">
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Dato</th>
+                                        <th scope="col">Tidspunkt</th>
+                                        <th scope="col">Grader</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var TemperaturDto in TemperaturDtos)
+                                    {
+                                        <tr>
+                                            <td>@TemperaturDto.Dato.ToShortDateString() </td>
+                                            <td>@TemperaturDto.Tidspunkt </td>
+                                            <td>@TemperaturDto.Grader &#8451 </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -72,6 +101,7 @@
     private HubConnection? hubConnection;
     private List<WeatherForcastDto> weatherForcastDtos = new List<WeatherForcastDto>();
     public SolarPanel solarPanel = new SolarPanel();
+    public List<TemperaturDto> TemperaturDtos = new List<TemperaturDto>();
     DateTime Sunrise = new DateTime();
     DateTime sunset = new DateTime();
 
@@ -79,6 +109,11 @@
     {
         await base.OnInitializedAsync();
         weatherForcastDtos = await dataService.GetWeatherForcast("kolding");
+
+        TemperaturDtos = await dataService.GetTemperaturFromInside(10);
+
+        solarPanel = await dataService.GetSolarPanelPower();
+
 
         sunset = weatherForcastDtos.First().Sunset;
         Sunrise = weatherForcastDtos.First().Sunrise;
@@ -89,15 +124,13 @@
 
         hubConnection.On("ReceiveNotification", async () =>
         {
-            solarPanel = await ftpServices.GetCalculateSolarPower();
+            solarPanel = await dataService.GetSolarPanelPower();
             StateHasChanged();
         });
 
         await hubConnection.StartAsync();
-
-        solarPanel = await ftpServices.GetCalculateSolarPower();
-
     }
+
 
     public async ValueTask DisposeAsync()
     {
@@ -106,5 +139,4 @@
             await hubConnection.DisposeAsync();
         }
     }
-
 }
