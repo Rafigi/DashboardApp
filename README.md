@@ -12,7 +12,6 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
 "FtpSettings": {
     "Username": "",
     "Password": "",
-    "FtpServerUri": ""
   }
   ```
   
