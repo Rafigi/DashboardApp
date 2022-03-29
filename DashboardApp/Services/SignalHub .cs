@@ -5,7 +5,8 @@ namespace DashboardApp.Services
 {
     public interface ISignalHub
     {
-        Task ReceiveNotification();
+        Task NotificationFtpChange();
+        Task NotificatioDatabaseChange();
     }
 
     public class SignalHub : Hub<ISignalHub>

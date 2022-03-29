@@ -18,14 +18,19 @@ namespace DashboardApp.BackgroundService
         }
 
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             int waitingMinutes = 60 - DateTime.Now.Minute;
-            _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(waitingMinutes), TimeSpan.FromHours(1));
-            return Task.CompletedTask;
+            await startTask("FTP", waitingMinutes, TimeSpan.FromHours(1));
+            await startTask("Database", 0, TimeSpan.FromMinutes(1));
         }
 
-        private async void DoWork(object? state)
+        private async Task startTask(string type, int watingTime, TimeSpan timeSpan)
+        {
+            _timer = new Timer(DoWork, type, TimeSpan.FromSeconds(watingTime), timeSpan);
+        }
+
+        private async void DoWork(object? typeName)
         {
             using (var scope = _services.CreateScope())
             {
@@ -33,10 +38,19 @@ namespace DashboardApp.BackgroundService
                     scope.ServiceProvider
                         .GetRequiredService<IDataService>();
 
-                await dataService.NotifyDashBoardDataHasChanged();
+                switch (typeName?.ToString())
+                {
+                    case "FTP":
+                        await dataService.NotifyFTPDataHasChanged();
+                        break;
+                    case "Database":
+                        await dataService.NotifyDatabaseDataHasChanged();
+                        break;
+                }
+
+
             }
         }
-
 
         public Task StopAsync(CancellationToken cancellationToken)
         {

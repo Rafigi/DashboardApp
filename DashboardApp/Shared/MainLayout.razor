@@ -122,9 +122,15 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/notifyhub"))
             .Build();
 
-        hubConnection.On("ReceiveNotification", async () =>
+        hubConnection.On("NotificationFtpChange", async () =>
         {
             solarPanel = await dataService.GetSolarPanelPower();
+            StateHasChanged();
+        });
+
+        hubConnection.On("NotificatioDatabaseChange", async () =>
+        {
+            TemperaturDtos = await dataService.GetTemperaturFromInside(10);
             StateHasChanged();
         });
 

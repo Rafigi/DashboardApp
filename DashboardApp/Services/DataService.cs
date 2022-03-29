@@ -13,7 +13,8 @@ namespace DashboardApp.Services
 {
     public interface IDataService
     {
-        Task NotifyDashBoardDataHasChanged();
+        Task NotifyFTPDataHasChanged();
+        Task NotifyDatabaseDataHasChanged();
         Task<List<WeatherForcastDto>> GetWeatherForcast(string location);
         Task<SolarPanel> GetSolarPanelPower();
 
@@ -34,10 +35,16 @@ namespace DashboardApp.Services
             _databaseServices = databaseServices;
         }
 
-        public async Task NotifyDashBoardDataHasChanged()
+        public async Task NotifyFTPDataHasChanged()
         {
-            await _context.Clients.All.ReceiveNotification();
+            await _context.Clients.All.NotificationFtpChange();
         }
+
+        public async Task NotifyDatabaseDataHasChanged()
+        {
+            await _context.Clients.All.NotificatioDatabaseChange();
+        }
+
 
         public async Task<List<WeatherForcastDto>> GetWeatherForcast(string location)
         {
