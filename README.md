@@ -2,9 +2,12 @@
 **For at denne solution kan køre, skal der tilføjes nogle settings i AppSettings.json i forskellige projekter.**
 <br>
 <br>
-I Dashboard projektet skal der tilføjet setting for at kunne kommunikere med FTP-server.
+I Dashboard projektet skal der tilføjet setting for at kunne kommunikere med FTP-server, samt connectionString for databasen.
 OBS! FtpServerURL skal ikke slutte med tegnet "/".
 <br>
+ "ConnectionStrings": {
+    "DefaultConnection": ""
+  },
 "FtpSettings": {
     "Username": "",
     "Password": "",
@@ -22,7 +25,7 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
   Hvis API ikke virker, tjek om porten i launchsettings i Dashboard projektet til 44320.
   
   
-  ![image](https://user-images.githubusercontent.com/36636158/160300758-f162598c-96c0-4826-938d-9eec605c04f7.png)
+![image](https://user-images.githubusercontent.com/36636158/160621135-243f8d8b-246e-4479-8fd0-5c4b2df482f5.png)
 
 
   
