@@ -28,7 +28,7 @@ namespace DashboardApp.BackgroundService
 
         private async Task startTask(string type, int watingTime, TimeSpan timeSpan)
         {
-            _timer = new Timer(DoWork, type, TimeSpan.FromSeconds(watingTime), timeSpan);
+            _timer = new Timer(DoWork, type, TimeSpan.FromMinutes(watingTime), timeSpan);
         }
 
         private async void DoWork(object? typeName)
