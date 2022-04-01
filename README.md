@@ -12,7 +12,6 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
 "FtpSettings": {
     "Username": "",
     "Password": "",
-    "FtpServerUri": ""
   }
   ```
   
@@ -27,7 +26,7 @@ OBS! FtpServerURL skal ikke slutte med tegnet "/".
   Hvis API ikke virker, tjek om porten i launchsettings i Dashboard projektet til 44320.
   
   
-![image](https://user-images.githubusercontent.com/36636158/160621135-243f8d8b-246e-4479-8fd0-5c4b2df482f5.png)
+![image](https://user-images.githubusercontent.com/36636158/160622147-dfb9dbcb-bfd0-486d-99ca-af023804f8cf.png)
 
 
   
