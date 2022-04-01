@@ -20,9 +20,10 @@ namespace DashboardApp.BackgroundService
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+
             int waitingMinutes = 60 - DateTime.Now.Minute;
             await startTask("FTP", waitingMinutes, TimeSpan.FromHours(1));
-            await startTask("Database", 0, TimeSpan.FromMinutes(1));
+            await startTask("Database", waitingMinutes, TimeSpan.FromMinutes(30));
         }
 
         private async Task startTask(string type, int watingTime, TimeSpan timeSpan)
