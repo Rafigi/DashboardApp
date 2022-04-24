@@ -52,18 +52,30 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="dashboard-box">
-                        <h2>FTP Solpanel</h2>
-                        <div>
-                            <p>@solarPanel.Date</p>
 
-                            Nuværende genereret strøm:
-                            <p> @solarPanel.Energy KWH</p>
+                    <div class="col">
+                        <div class="dashboard-box">
+                            <h2>FTP Solpanel</h2>
+                            <div>
+                                <p>@solarPanel.Date</p>
 
+                                Nuværende genereret strøm:
+                                <p> @solarPanel.Energy KWH</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-box">
+                            <h2>Kafka Priser KWH</h2>
+                            <div>
+                                Nuværende Pris pr KWH:
+                                <p> @kwhPrice Kr. KWH</p>
+
+                            </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="col">
                     <div class="dashboard-box">
                         <h2>Database: Temperatur indenfor</h2>
@@ -104,6 +116,7 @@
     public List<TemperaturDto> TemperaturDtos = new List<TemperaturDto>();
     DateTime Sunrise = new DateTime();
     DateTime sunset = new DateTime();
+    string kwhPrice = "0";
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,7 +126,6 @@
         TemperaturDtos = await dataService.GetTemperaturFromInside(10);
 
         solarPanel = await dataService.GetSolarPanelPower();
-
 
         sunset = weatherForcastDtos.First().Sunset;
         Sunrise = weatherForcastDtos.First().Sunrise;
@@ -135,6 +147,12 @@
         });
 
         await hubConnection.StartAsync();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        kwhPrice = await dataService.SendKafkaMessageToKafkaPriceService();
     }
 
 

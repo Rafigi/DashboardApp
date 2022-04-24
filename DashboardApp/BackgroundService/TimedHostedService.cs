@@ -47,6 +47,9 @@ namespace DashboardApp.BackgroundService
                     case "Database":
                         await dataService.NotifyDatabaseDataHasChanged();
                         break;
+                    case "Kafka":
+                        //await dataService.SendKafkaMessageToKafkaPriceService();
+                        break;
                 }
 
 

@@ -36,7 +36,7 @@ namespace FTPServices.Services
 
             int columnIndex = -1;
             var value = new List<int>();
-            foreach (string rows in reader.ReadToEnd().Split('\n').Skip(5))
+            foreach (string rows in (await reader.ReadToEndAsync()).Split('\n').Skip(5))
             {
                 if (!string.IsNullOrEmpty(rows))
                 {

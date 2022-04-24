@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ServiceReference1;
@@ -31,7 +30,7 @@ namespace SoapServices.Services
             var client = new ForecastServiceClient();
             var result = await client.GetForecastAsync(location, _soapSettings.Value.Password);
 
-            var selectedResult = result.Body.GetForecastResult.location;
+            Location selectedResult = result.Body.GetForecastResult.location;
 
             return selectedResult
                 .MapToWeatherForcastDto();
@@ -53,10 +52,5 @@ namespace SoapServices.Services
             })
                 .ToList();
         }
-
-        public static string ConvertToJSON(this WeatherForcastDto weatherForcastDto)
-            => JsonSerializer.Serialize(weatherForcastDto);
-
-
     }
 }

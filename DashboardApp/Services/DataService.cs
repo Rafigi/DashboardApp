@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using DashboardApp.Models;
 using DatabaseService.Dtos;
 using DatabaseService.Services;
@@ -8,6 +11,8 @@ using FTPServices.Models;
 using FTPServices.Services;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using PowerPriceKafkaServices.Common;
+using PowerPriceKafkaServices.Services;
 
 namespace DashboardApp.Services
 {
@@ -19,6 +24,7 @@ namespace DashboardApp.Services
         Task<SolarPanel> GetSolarPanelPower();
 
         Task<List<TemperaturDto>> GetTemperaturFromInside(int take);
+        Task<string> SendKafkaMessageToKafkaPriceService();
     }
     public class DataService : IDataService
     {
@@ -66,6 +72,33 @@ namespace DashboardApp.Services
         public async Task<List<TemperaturDto>> GetTemperaturFromInside(int take)
         {
             return await _databaseServices.GetTemperatursAsync(take);
+        }
+
+        public async Task<string> SendKafkaMessageToKafkaPriceService()
+        {
+            Guid correlationId = Guid.NewGuid();
+            Header header = new Header("correlationId", correlationId.ToByteArray());
+            KafkaServices requestService = new RequestService();
+            await requestService.ProduceMessageWithHeaderAsync(KafkaTopics.requestService, "Ask for new price", header);
+
+            using (var consumer = new ReplyService().CreateConsumerBuilder().Build())
+            {
+                consumer.Subscribe(KafkaTopics.replyService);
+                Console.WriteLine($"On Channel => {KafkaTopics.replyService}");
+                ConsumeResult<Ignore, string> consumeResult;
+                while (true)
+                {
+                    consumeResult = consumer.Consume();
+                    var guid = consumeResult.Message.Headers.First(p => p.Key == "correlationId").GetValueBytes();
+                    if (new Guid(guid) == correlationId)
+                    {
+                        consumer.Close();
+                        consumer.Dispose();
+                        break;
+                    }
+                }
+                return consumeResult.Message.Value;
+            }
         }
     }
 }
