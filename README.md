@@ -2,7 +2,7 @@
 **For at denne solution kan køre, skal der tilføjes nogle settings i AppSettings.json i forskellige projekter, satm oprettes Topics i Kafka**
 <br>
 <br>
-De forskellige Topics der skal tilføjes for at applikationen kan køre. 
+De forskellige Topics der skal tilføjes til Kafka for at applikationen kan køre. 
 1. transformService-transformData
 2. downloadService-downloadFile
 3. cacheService-IsCached
@@ -10,7 +10,8 @@ De forskellige Topics der skal tilføjes for at applikationen kan køre.
 5. requestService
 6. replyService
 
-Husk at ændre boostrapServer i KafkaServices..PowerPriceKafkaServices. Common NameSapce 
+Husk at ændre boostrapServer i Namespace: KafkaServices.PowerPriceKafkaServices.Common
+<br>
 KafkaServices.cs => bootStrapServer
 
 ![image](https://user-images.githubusercontent.com/36636158/164982615-f2944dd6-1766-4cb8-a0cb-7220bc200b1d.png)
