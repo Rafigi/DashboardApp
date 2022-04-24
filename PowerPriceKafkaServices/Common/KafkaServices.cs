@@ -10,15 +10,16 @@ namespace PowerPriceKafkaServices.Common
     {
         public Thread thread;
         public string _topic;
+        private static string bootStrapServer = "localhost:29092";
         private readonly ConsumerConfig consumerConfig = new()
         {
-            BootstrapServers = "localhost:29092",
-            GroupId = "Gruppe",
+            BootstrapServers = bootStrapServer,
+            GroupId = "KafkaGroup",
         };
 
         private readonly ProducerConfig producerConfig = new()
         {
-            BootstrapServers = "localhost:29092",
+            BootstrapServers = bootStrapServer,
             ClientId = Dns.GetHostName()
         };
 
