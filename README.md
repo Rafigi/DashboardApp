@@ -13,7 +13,10 @@ De forskellige Topics der skal tilføjes til Kafka for at applikationen kan kør
 Husk at ændre boostrapServer i Namespace: KafkaServices.PowerPriceKafkaServices.Common
 <br>
 KafkaServices.cs => bootStrapServer
+<br>
 Der er tilføjet en docker-compose file, hvis der bruges docker. Samt et powershell script, som tilføjer de forskellige topics automatisk.
+<br>
+Disse ligger i samme namepace i setup mappen.
 
 ![image](https://user-images.githubusercontent.com/36636158/164982615-f2944dd6-1766-4cb8-a0cb-7220bc200b1d.png)
 
