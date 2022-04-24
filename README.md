@@ -2,7 +2,7 @@
 **For at denne solution kan køre, skal der tilføjes nogle settings i AppSettings.json i forskellige projekter, satm oprettes Topics i Kafka**
 <br>
 <br>
-De forskellige Topics der skal tilføjes for at applikationen kan køre. 
+De forskellige Topics der skal tilføjes til Kafka for at applikationen kan køre. 
 1. transformService-transformData
 2. downloadService-downloadFile
 3. cacheService-IsCached
